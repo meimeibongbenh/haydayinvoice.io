@@ -139,13 +139,13 @@
             { name: "Phô mai dê", image: "https://lh3.googleusercontent.com/d/1tg8qFYh8MmBEnAZZr0H0GwrKvqHg-HDc=w500", category: "Nguyên Liệu" },
             { name: "Đường nâu", image: "https://lh3.googleusercontent.com/d/1Ts30YA3V5ty5BAiAa34NHtdBM4Sm-2W-=w500", category: "Nguyên Liệu" },
             { name: "Đường trắng", image: "https://lh3.googleusercontent.com/d/18b6xiwUNyKO4ZFAysWIgil4ATNDLNgve=w500", category: "Nguyên Liệu" },
-            { name: "Siro", image: "https://lh3.googleusercontent.com/d/1lscNRk5XKczxIY5DGzQxDpOcHupj4D96=w500", category: "Nguyên Liệu" },  
-            { name: "Phi lê cá", image: "https://lh3.googleusercontent.com/d/1C-aySvayimDN_VRPZOGlMzRDR_AV1l_M=w500", category: "Nguyên Liệu" },       
+            { name: "Siro", image: "https://lh3.googleusercontent.com/d/1lscNRk5XKczxIY5DGzQxDpOcHupj4D96=w500", category: "Nguyên Liệu" },
+            { name: "Phi lê cá", image: "https://lh3.googleusercontent.com/d/1C-aySvayimDN_VRPZOGlMzRDR_AV1l_M=w500", category: "Nguyên Liệu" },
             { name: "Đuôi tôm hùm", image: "https://lh3.googleusercontent.com/d/1AYs3ZNvLF0rhJqV_1LOd0AstMfyhU58V=w500", category: "Nguyên Liệu" },
             { name: "Lông vịt", image: "https://lh3.googleusercontent.com/d/1cT2Qf8L8Mnvq0SOR_P9ve_-0Wgkb6zI3=w500", category: "Nguyên Liệu" },
             { name: "Hũ mật ong", image: "https://lh3.googleusercontent.com/d/1XlxG0VLQV_PG4JO1pI3eEtZLqHh5E2pI=w500", category: "Nguyên Liệu" },
             { name: "Sáp ong", image: "https://lh3.googleusercontent.com/d/1bk6dtsAKs06tVHxbg_f_N9jqsQr6qzuZ=w500", category: "Nguyên Liệu" },
-            
+
         ];
 
         const cart = {};
@@ -211,13 +211,22 @@
             const invoice = document.getElementById("invoice");
             html2canvas(invoice, {
                 scale: 3,
-                useCORS: true
+                useCORS: true, // Đảm bảo CORS được sử dụng
             }).then(canvas => {
                 const link = document.createElement("a");
-                link.download = "hoa_don.png";
+                link.download = "hoa_don.png"; // Tên file bạn muốn lưu
                 link.href = canvas.toDataURL("image/png");
+
+                // Thêm liên kết vào trang để có thể click
+                document.body.appendChild(link);
                 link.click();
+
+                // Xóa liên kết sau khi nhấn để tránh ảnh hưởng tới DOM
+                document.body.removeChild(link);
+            }).catch(error => {
+                console.error("Lỗi khi tải hóa đơn:", error);
             });
+
         }
 
         loadMenu();

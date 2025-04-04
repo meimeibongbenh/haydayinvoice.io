@@ -118,12 +118,22 @@
             margin-top: 10px;
             color: #eb7632;
         }
+
+        .filter-bar {
+            margin-bottom: 20px;
+        }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </head>
 
 <body>
     <h1>Chọn Món Cần Mua</h1>
+    <div class="filter-bar">
+        <label for="categoryFilter">Lọc theo loại:</label>
+        <select id="categoryFilter" onchange="filterMenu()">
+            <option value="all">Tất cả</option>
+        </select>
+    </div>
     <div class="menu" id="menu"></div>
     <div class="controls-top">
         <button onclick="generateInvoice()">Xuất Hóa Đơn</button>
@@ -145,28 +155,69 @@
             { name: "Lông vịt", image: "https://lh3.googleusercontent.com/d/1cT2Qf8L8Mnvq0SOR_P9ve_-0Wgkb6zI3=w500", category: "Nguyên Liệu" },
             { name: "Hũ mật ong", image: "https://lh3.googleusercontent.com/d/1XlxG0VLQV_PG4JO1pI3eEtZLqHh5E2pI=w500", category: "Nguyên Liệu" },
             { name: "Sáp ong", image: "https://lh3.googleusercontent.com/d/1bk6dtsAKs06tVHxbg_f_N9jqsQr6qzuZ=w500", category: "Nguyên Liệu" },
-
+            { name: "Nước ép cà rốt", image: "https://lh3.googleusercontent.com/d/1-AmIUHj_wYsG2oGVOogYI9ars5hI-zSf=w500", category: "Nước ép" },
+            { name: "Nước ép táo", image: "https://lh3.googleusercontent.com/d/1rsc4mG3t6hiNFQzDgsdY0mrQukyt2FVf=w500", category: "Nước ép" },
+            { name: "Nước ép anh đào", image: "https://lh3.googleusercontent.com/d/1yhTDJtL950wB4QXbDkcdAgXLVbOtyrRK=w500", category: "Nước ép" },
+            { name: "Nước ép cà chua", image: "https://lh3.googleusercontent.com/d/1aMlTJEl-qD3gm3O37duv88SGa3qe9WT-=w500", category: "Nước ép" },
+            { name: "Nước ép quả mọng", image: "https://lh3.googleusercontent.com/d/1sk7DdIHAFd7LHE9ou1afwqoyprbMnYBQ=w500", category: "Nước ép" },
+            { name: "Mứt táo", image: "https://lh3.googleusercontent.com/d/1MgZAz3qaCNLA3EzuHRchzuhAckiJZTok=w500", category: "Mứt" },
+            { name: "Mứt mâm xôi đỏ", image: "https://lh3.googleusercontent.com/d/1oMWjF4FKc5KLQjqTGKjjXR-ODD5RnOpr=w500", category: "Mứt" },
+            { name: "Mứt mâm xôi tím", image: "https://lh3.googleusercontent.com/d/11qOPoEOKtM9haLGqmLgyImBPDBs1RlK3=w500", category: "Mứt" },
+            { name: "Mứt anh đào", image: "https://lh3.googleusercontent.com/d/1GriXANkfHDYdb7bvVzWlX3FQx1-tMUK6=w500", category: "Mứt" },
+            { name: "Mứt dâu tây", image: "https://lh3.googleusercontent.com/d/1G7-SvBAIFsp417TT3CtMuWDXgiV8ReBR=w500", category: "Mứt" },
+            { name: "Thỏi bạc", image: "https://lh3.googleusercontent.com/d/1JxCUiGH7iVwHFGJ8uJG_-MZ4jamXH3WF=w500", category: "Khoáng sản" },
+            { name: "Thỏi vàng", image: "https://lh3.googleusercontent.com/d/1rV22MYWOx9M4UTUYNIGCZTKFo7DxtsoC=w500", category: "Khoáng sản" },
+            { name: "Thỏi bạch kim", image: "https://lh3.googleusercontent.com/d/1ywsfF6Kqr9fxA5VTLFHRFmPA_HPZc6_Z=w500", category: "Khoáng sản" },
+            { name: "Than", image: "https://lh3.googleusercontent.com/d/1b710hQznuYvbVUxMF3T68e5Efi7dEnDL=w500", category: "Khoáng sản" },
+            { name: "Thỏi sắt", image: "https://lh3.googleusercontent.com/d/1gBepoL10sokUNIwurzrYKVSiWwhN8SPr=w500", category: "Khoáng sản" },
         ];
 
         const cart = {};
+        let selectedCategory = "all";
 
-        function loadMenu() {
-            const menu = document.getElementById("menu");
-            items.forEach((item, index) => {
-                const div = document.createElement("div");
-                div.className = "item";
-                div.innerHTML = `
-                    <img src="${item.image}" alt="${item.name}">
-                    <div class="category-tag">${item.category}</div>
-                    <div class="controls">
-                        <button onclick="changeQuantity(event, ${index}, -1)">-</button>
-                        <span id="quantity-${index}">0</span>
-                        <button onclick="changeQuantity(event, ${index}, 1)">+</button>
-                    </div>
-                `;
-                menu.appendChild(div);
+        // Tạo danh sách category duy nhất
+        const categories = [...new Set(items.map(item => item.category))];
+
+        // Hiển thị danh sách lọc
+        function loadCategoryFilter() {
+            const categoryFilter = document.getElementById("categoryFilter");
+            categories.forEach(category => {
+                const option = document.createElement("option");
+                option.value = category;
+                option.textContent = category;
+                categoryFilter.appendChild(option);
             });
         }
+
+        // Hiển thị món ăn dựa vào category được chọn
+        function loadMenu() {
+            const menu = document.getElementById("menu");
+            menu.innerHTML = ""; // Xóa danh sách cũ
+
+            items.forEach((item, index) => {
+                if (selectedCategory === "all" || item.category === selectedCategory) {
+                    const div = document.createElement("div");
+                    div.className = "item";
+                    div.innerHTML = `
+                <img src="${item.image}" alt="${item.name}">
+                <div class="category-tag">${item.category}</div>
+                <div class="controls">
+                    <button onclick="changeQuantity(event, ${index}, -1)">-</button>
+                    <span id="quantity-${index}">0</span>
+                    <button onclick="changeQuantity(event, ${index}, 1)">+</button>
+                </div>
+            `;
+                    menu.appendChild(div);
+                }
+            });
+        }
+
+        // Cập nhật category và load lại menu
+        function filterMenu() {
+            selectedCategory = document.getElementById("categoryFilter").value;
+            loadMenu();
+        }
+
 
         function changeQuantity(event, index, amount) {
             event.stopPropagation();
@@ -211,13 +262,13 @@
             const invoice = document.getElementById("invoice");
             html2canvas(invoice, {
                 scale: 3,
-                useCORS: true, // Đảm bảo CORS được sử dụng
+                useCORS: true,
             }).then(canvas => {
                 const link = document.createElement("a");
-                link.download = "hoa_don.png"; // Tên file bạn muốn lưu
+                link.download = "hoa_don.png";
                 link.href = canvas.toDataURL("image/png");
 
-                // Thêm liên kết vào trang để có thể click
+
                 document.body.appendChild(link);
                 link.click();
 
@@ -228,7 +279,8 @@
             });
 
         }
-
+        
+        loadCategoryFilter();
         loadMenu();
     </script>
 
